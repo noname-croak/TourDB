@@ -12,4 +12,5 @@
 
 •	Бронирование номеров в отелях и мест на рейсах;
 
-![image](https://github.com/noname-croak/TourDB/assets/108826308/6eeb4575-9781-40be-a157-b102a5db5252)
+![image](https://github.com/noname-croak/TourDB/assets/108826308/8333ce2f-0f3b-40bc-b2b2-45a9ed35cdd5)
+
