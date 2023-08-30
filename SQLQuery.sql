@@ -37,7 +37,7 @@ begin
 	if (((select ClientID from inserted) not in (select ClientID from Clients)) or ((select TourID from inserted) not in (select TourID from Tours)))
 		begin
 			rollback tran;
-			throw 50001, 'Ввод некорректных значений, транзакция отменена', 0;
+			throw 50001, 'Р’РІРѕРґ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹С… Р·РЅР°С‡РµРЅРёР№, С‚СЂР°РЅР·Р°РєС†РёСЏ РѕС‚РјРµРЅРµРЅР°', 0;
 		end;
 	declare @Client int
 	declare @Tour int
@@ -60,7 +60,7 @@ begin
 	if not exists (select * from BoughtTours where ClientID = @Client and TourID = @Tour)
 		begin
 			rollback tran;
-			throw 50001, 'Данный тур не был куплен данным пользователем', 0;
+			throw 50001, 'Р”Р°РЅРЅС‹Р№ С‚СѓСЂ РЅРµ Р±С‹Р» РєСѓРїР»РµРЅ РґР°РЅРЅС‹Рј РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј', 0;
 		end;
 	delete from BoughtTours where ClientID = @Client and TourID = @Tour
 end
@@ -78,7 +78,7 @@ begin
 		if (((select TourID from inserted) not in (select TourID from Tours)) or ((select TourID from deleted) not in (select TourID from Tours)) or not exists (select CLientID from Clients where ClientID = @Client))
 		begin
 			rollback tran;
-			throw 50001, 'Ввод некорректных значений, транзакция отменена', 0;
+			throw 50001, 'Р’РІРѕРґ РЅРµРєРѕСЂСЂРµРєС‚РЅС‹С… Р·РЅР°С‡РµРЅРёР№, С‚СЂР°РЅР·Р°РєС†РёСЏ РѕС‚РјРµРЅРµРЅР°', 0;
 		end;
 		declare @OldTour int
 		declare @NewTour int
@@ -100,7 +100,7 @@ create procedure pr_BuyTour
 			insert into vBoughtTours (ClientID, TourID)
 			values (@ClientID, @TourID)
 		else
-			print 'Данная путёвка уже распродана'
+			print 'Р”Р°РЅРЅР°СЏ РїСѓС‚С‘РІРєР° СѓР¶Рµ СЂР°СЃРїСЂРѕРґР°РЅР°'
 	end 
 go
 
@@ -112,7 +112,7 @@ create procedure pr_ReturnTour
 		if (((select Departure from Tours where TourID = @TourID) > GETDATE()) or not exists (select Departure from Tours where TourID = @TourID))
 			delete from vBoughtTours where ClientID = @ClientID and TourID = @TourID
 		else
-			print 'Путёвку можно сдать не позднее, чем за день до вылета'
+			print 'РџСѓС‚С‘РІРєСѓ РјРѕР¶РЅРѕ СЃРґР°С‚СЊ РЅРµ РїРѕР·РґРЅРµРµ, С‡РµРј Р·Р° РґРµРЅСЊ РґРѕ РІС‹Р»РµС‚Р°'
 	end
 go
 
@@ -123,9 +123,9 @@ create procedure pr_ChangeTour
 	as
 	begin
 		if (select Departure from Tours where TourID = @TourID) <= GETDATE()
-			print 'Нельзя поменять просроченную путевку'
+			print 'РќРµР»СЊР·СЏ РїРѕРјРµРЅСЏС‚СЊ РїСЂРѕСЃСЂРѕС‡РµРЅРЅСѓСЋ РїСѓС‚РµРІРєСѓ'
 		else if (select Departure from Tours where TourID = @NewTourID) <= GETDATE()
-			print 'Новая путевка уже распродана'
+			print 'РќРѕРІР°СЏ РїСѓС‚РµРІРєР° СѓР¶Рµ СЂР°СЃРїСЂРѕРґР°РЅР°'
 		else
 		begin
 			set rowcount 1
@@ -143,9 +143,9 @@ create procedure pr_AvailableTourByTypeAndMaxPrice
 		declare @MinPrice money
 		select @MinPrice = min(Price) from vAllTours
 		if @Type not in (select distinct TourType from vAllTours)
-			print 'Туры данного типа пока не устраиваются нашим агенством';
+			print 'РўСѓСЂС‹ РґР°РЅРЅРѕРіРѕ С‚РёРїР° РїРѕРєР° РЅРµ СѓСЃС‚СЂР°РёРІР°СЋС‚СЃСЏ РЅР°С€РёРј Р°РіРµРЅСЃС‚РІРѕРј';
 		else if (@MaxPrice < @MinPrice)
-			print 'Туров по заданной цене пока нет';
+			print 'РўСѓСЂРѕРІ РїРѕ Р·Р°РґР°РЅРЅРѕР№ С†РµРЅРµ РїРѕРєР° РЅРµС‚';
 		else
 			select * from vAllTours where TourType = @Type and Price <= @MaxPrice and Departure > getdate()
 	end
@@ -156,9 +156,9 @@ create procedure pr_ClientsHotel
 	as
 	begin
 		if @ClientID not in (Select ClientID from Clients)
-			print 'Неверный ID клиента';
+			print 'РќРµРІРµСЂРЅС‹Р№ ID РєР»РёРµРЅС‚Р°';
 		else if @ClientID not in (Select ClientID from BoughtTours)
-			print 'Чтобы посмотреть забронированные отели, нужно сначала купить путёвку';
+			print 'Р§С‚РѕР±С‹ РїРѕСЃРјРѕС‚СЂРµС‚СЊ Р·Р°Р±СЂРѕРЅРёСЂРѕРІР°РЅРЅС‹Рµ РѕС‚РµР»Рё, РЅСѓР¶РЅРѕ СЃРЅР°С‡Р°Р»Р° РєСѓРїРёС‚СЊ РїСѓС‚С‘РІРєСѓ';
 		else
 			select * from vBookedHotelRoom where ClientID = @ClientID and StartingDay > GETDATE()
 	end
@@ -169,9 +169,9 @@ create procedure pr_ClientsFlight
 	as
 	begin
 		if @ClientID not in (Select ClientID from Clients)
-			print 'Неверный ID клиента';
+			print 'РќРµРІРµСЂРЅС‹Р№ ID РєР»РёРµРЅС‚Р°';
 		else if @ClientID not in (Select ClientID from BoughtTours)
-			print 'Чтобы посмотреть забронированные рейсы, нужно сначала купить путёвку';
+			print 'Р§С‚РѕР±С‹ РїРѕСЃРјРѕС‚СЂРµС‚СЊ Р·Р°Р±СЂРѕРЅРёСЂРѕРІР°РЅРЅС‹Рµ СЂРµР№СЃС‹, РЅСѓР¶РЅРѕ СЃРЅР°С‡Р°Р»Р° РєСѓРїРёС‚СЊ РїСѓС‚С‘РІРєСѓ';
 		else
 			select * from vBookedFlightTickets where ClientID = @ClientID and Departure > getdate()
 	end
@@ -211,20 +211,20 @@ return
 )
 go	
 
---Пример
---Просмотр популярных маршрутов клиентом
+--РџСЂРёРјРµСЂ
+--РџСЂРѕСЃРјРѕС‚СЂ РїРѕРїСѓР»СЏСЂРЅС‹С… РјР°СЂС€СЂСѓС‚РѕРІ РєР»РёРµРЅС‚РѕРј
 select * from ufnRoutesPopularity() order by Ordered desc
---Поиск маршрута клиентом
+--РџРѕРёСЃРє РјР°СЂС€СЂСѓС‚Р° РєР»РёРµРЅС‚РѕРј
 execute pr_AvailableTourByTypeAndMaxPrice 'Sightseeing', 1300
---Покупка путёвки
+--РџРѕРєСѓРїРєР° РїСѓС‚С‘РІРєРё
 execute pr_BuyTour 10, 16
---Клиент понял, что ошибся номеров тура
+--РљР»РёРµРЅС‚ РїРѕРЅСЏР», С‡С‚Рѕ РѕС€РёР±СЃСЏ РЅРѕРјРµСЂРѕРІ С‚СѓСЂР°
 execute pr_ChangeTour 10, 16, 12
---Проверка заброниваролись ли места в отеле
+--РџСЂРѕРІРµСЂРєР° Р·Р°Р±СЂРѕРЅРёСЂРѕРІР°Р»РёСЃСЊ Р»Рё РјРµСЃС‚Р° РІ РѕС‚РµР»Рµ
 execute pr_ClientsHotel 10
---Проверка забронировались ли белиты на рейсы
+--РџСЂРѕРІРµСЂРєР° Р·Р°Р±СЂРѕРЅРёСЂРѕРІР°Р»РёСЃСЊ Р»Рё Р±РµР»РёС‚С‹ РЅР° СЂРµР№СЃС‹
 execute pr_ClientsFlight 10
---Просмотр затраченных денег в данном турагенстве
+--РџСЂРѕСЃРјРѕС‚СЂ Р·Р°С‚СЂР°С‡РµРЅРЅС‹С… РґРµРЅРµРі РІ РґР°РЅРЅРѕРј С‚СѓСЂР°РіРµРЅСЃС‚РІРµ
 select dbo.ufnClientsSpentMoney(10)
 
 
